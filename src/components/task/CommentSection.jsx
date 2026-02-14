@@ -138,7 +138,12 @@ export const CommentSection = ({ taskId }) => {
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="flex items-end space-x-2">
           <div className="flex-1">
+            <label htmlFor="comment-text" className="sr-only">
+              Comment text
+            </label>
             <textarea
+              id="comment-text"
+              name="comment-text"
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               placeholder="Add a comment..."
