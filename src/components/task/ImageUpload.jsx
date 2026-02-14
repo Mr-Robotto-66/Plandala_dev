@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useImageUpload } from '../../hooks/useImageUpload';
 import { getImageFromClipboard } from '../../utils/imageCompression';
@@ -14,16 +14,11 @@ export const ImageUpload = ({
 }) => {
   const { uploadMultipleImages, uploading, progress, error } = useImageUpload();
   const [previewUrls, setPreviewUrls] = useState([]);
-  const [uploadedUrls, setUploadedUrls] = useState([]);
   const [removedExistingImages, setRemovedExistingImages] = useState([]);
   const [configError, setConfigError] = useState(null);
 
-  // Check Firebase configuration on mount
-  useEffect(() => {
-    if (!isFirebaseConfigured) {
-      setConfigError(getFirebaseError());
-    }
-  }, []);
+  // Ref to store the latest onDrop callback for paste event handler
+  const onDropRef = useRef(null);
 
   // Handle file drop
   const onDrop = useCallback(async (acceptedFiles) => {
@@ -38,7 +33,6 @@ export const ImageUpload = ({
     try {
       // Upload files
       const urls = await uploadMultipleImages(acceptedFiles, folder);
-      setUploadedUrls((prev) => [...prev, ...urls]);
 
       if (onImagesUploaded) {
         onImagesUploaded(urls);
@@ -54,6 +48,18 @@ export const ImageUpload = ({
     }
   }, [uploadMultipleImages, folder, onImagesUploaded]);
 
+  // Check Firebase configuration on mount
+  useEffect(() => {
+    if (!isFirebaseConfigured) {
+      setConfigError(getFirebaseError());
+    }
+  }, []);
+
+  // Keep ref updated with latest onDrop callback
+  useEffect(() => {
+    onDropRef.current = onDrop;
+  }, [onDrop]);
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
@@ -63,13 +69,13 @@ export const ImageUpload = ({
     disabled: uploading,
   });
 
-  // Handle paste event
+  // Handle paste event - registered once, uses ref to always call latest onDrop
   useEffect(() => {
     const handlePaste = async (e) => {
       const image = await getImageFromClipboard(e.clipboardData);
-      if (image) {
+      if (image && onDropRef.current) {
         e.preventDefault();
-        onDrop([image]);
+        onDropRef.current([image]);
       }
     };
 
@@ -77,7 +83,7 @@ export const ImageUpload = ({
     return () => {
       window.removeEventListener('paste', handlePaste);
     };
-  }, [onDrop]);
+  }, []); // Empty deps - listener registered once per mount
 
   // Cleanup preview URLs on unmount
   useEffect(() => {
@@ -85,10 +91,6 @@ export const ImageUpload = ({
       previewUrls.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [previewUrls]);
-
-  const removeUploadedImage = (index) => {
-    setUploadedUrls((prev) => prev.filter((_, i) => i !== index));
-  };
 
   const removeExistingImage = (url) => {
     setRemovedExistingImages((prev) => [...prev, url]);
@@ -208,28 +210,6 @@ export const ImageUpload = ({
                 </button>
               </div>
             ))}
-        </div>
-      )}
-
-      {/* Uploaded Images */}
-      {uploadedUrls.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {uploadedUrls.map((url, index) => (
-            <div key={index} className="relative group aspect-video rounded-lg overflow-hidden">
-              <img
-                src={url}
-                alt={`Uploaded ${index + 1}`}
-                className="w-full h-full object-cover"
-              />
-              <button
-                onClick={() => removeUploadedImage(index)}
-                className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                aria-label="Remove image"
-              >
-                <X size={16} />
-              </button>
-            </div>
-          ))}
         </div>
       )}
     </div>

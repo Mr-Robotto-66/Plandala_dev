@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTasks } from '../../hooks/useTasks';
 import { useUser } from '../../context/UserContext';
 import { LoadingSpinner } from '../common/LoadingSpinner';
@@ -71,19 +71,19 @@ export const TaskForm = ({ task = null, onClose, onSave, defaultStatus, defaultP
     }));
   };
 
-  const handleImagesUploaded = (urls) => {
+  const handleImagesUploaded = useCallback((urls) => {
     setFormData((prev) => ({
       ...prev,
       imageUrls: [...prev.imageUrls, ...urls],
     }));
-  };
+  }, []);
 
-  const handleImageRemoved = (url) => {
+  const handleImageRemoved = useCallback((url) => {
     setFormData((prev) => ({
       ...prev,
       imageUrls: prev.imageUrls.filter((imageUrl) => imageUrl !== url),
     }));
-  };
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

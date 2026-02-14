@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useComments } from '../../hooks/useComments';
 import { useUser } from '../../context/UserContext';
 import { LoadingSpinner } from '../common/LoadingSpinner';
@@ -39,13 +39,13 @@ export const CommentSection = ({ taskId }) => {
     }
   };
 
-  const handleImagesUploaded = (urls) => {
+  const handleImagesUploaded = useCallback((urls) => {
     setCommentImages((prev) => [...prev, ...urls]);
-  };
+  }, []);
 
-  const handleImageRemoved = (url) => {
+  const handleImageRemoved = useCallback((url) => {
     setCommentImages((prev) => prev.filter((imageUrl) => imageUrl !== url));
-  };
+  }, []);
 
   const formatDate = (timestamp) => {
     if (!timestamp) return 'Just now';

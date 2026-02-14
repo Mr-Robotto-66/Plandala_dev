@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { uploadImage, generateImagePath } from '../lib/storage';
 import { compressImage, validateImageFile } from '../utils/imageCompression';
 
@@ -7,7 +7,7 @@ export const useImageUpload = () => {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
 
-  const uploadSingleImage = async (file, folder) => {
+  const uploadSingleImage = useCallback(async (file, folder) => {
     try {
       setUploading(true);
       setProgress(0);
@@ -40,9 +40,9 @@ export const useImageUpload = () => {
       setUploading(false);
       setProgress(0);
     }
-  };
+  }, []);
 
-  const uploadMultipleImages = async (files, folder) => {
+  const uploadMultipleImages = useCallback(async (files, folder) => {
     try {
       setUploading(true);
       setProgress(0); // EXPLICIT RESET
@@ -102,7 +102,7 @@ export const useImageUpload = () => {
       setUploading(false);
       setProgress(0);
     }
-  };
+  }, []);
 
   const resetUpload = () => {
     setUploading(false);
