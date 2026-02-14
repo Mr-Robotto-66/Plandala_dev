@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useComments } from '../../hooks/useComments';
 import { useUser } from '../../context/UserContext';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { ImageUpload } from './ImageUpload';
 import { Send, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -9,16 +10,18 @@ export const CommentSection = ({ taskId }) => {
   const { comments, addComment, removeComment, loading, error } = useComments(taskId);
   const { userName } = useUser();
   const [newComment, setNewComment] = useState('');
+  const [commentImages, setCommentImages] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!newComment.trim()) return;
+    if (!newComment.trim() && commentImages.length === 0) return;
 
     try {
       setSubmitting(true);
-      await addComment(newComment);
+      await addComment(newComment, commentImages);
       setNewComment('');
+      setCommentImages([]);
     } catch (err) {
       console.error('Failed to add comment:', err);
     } finally {
@@ -34,6 +37,14 @@ export const CommentSection = ({ taskId }) => {
     } catch (err) {
       console.error('Failed to delete comment:', err);
     }
+  };
+
+  const handleImagesUploaded = (urls) => {
+    setCommentImages((prev) => [...prev, ...urls]);
+  };
+
+  const handleImageRemoved = (url) => {
+    setCommentImages((prev) => prev.filter((imageUrl) => imageUrl !== url));
   };
 
   const formatDate = (timestamp) => {
@@ -124,30 +135,40 @@ export const CommentSection = ({ taskId }) => {
       </div>
 
       {/* Add Comment Form */}
-      <form onSubmit={handleSubmit} className="flex items-end space-x-2">
-        <div className="flex-1">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Add a comment..."
-            rows={2}
-            className="w-full px-4 py-3 rounded-lg bg-plandala-surface border border-plandala-border text-plandala-text placeholder-plandala-muted focus:outline-none focus:border-plandala-cyan-400 transition-colors resize-none"
-            disabled={submitting}
-          />
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="flex items-end space-x-2">
+          <div className="flex-1">
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Add a comment..."
+              rows={2}
+              className="w-full px-4 py-3 rounded-lg bg-plandala-surface border border-plandala-border text-plandala-text placeholder-plandala-muted focus:outline-none focus:border-plandala-cyan-400 transition-colors resize-none"
+              disabled={submitting}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting || (!newComment.trim() && commentImages.length === 0)}
+            className="px-4 py-3 rounded-lg bg-gradient-to-r from-plandala-cyan-400 to-plandala-magenta-500 text-white hover:glow-cyan transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            aria-label="Send comment"
+          >
+            {submitting ? (
+              <LoadingSpinner size={18} />
+            ) : (
+              <Send size={18} />
+            )}
+          </button>
         </div>
 
-        <button
-          type="submit"
-          disabled={submitting || !newComment.trim()}
-          className="px-4 py-3 rounded-lg bg-gradient-to-r from-plandala-cyan-400 to-plandala-magenta-500 text-white hover:glow-cyan transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-          aria-label="Send comment"
-        >
-          {submitting ? (
-            <LoadingSpinner size={18} />
-          ) : (
-            <Send size={18} />
-          )}
-        </button>
+        {/* Image Upload */}
+        <ImageUpload
+          onImagesUploaded={handleImagesUploaded}
+          onImageRemoved={handleImageRemoved}
+          existingImages={commentImages}
+          folder={`comment-images/${taskId}`}
+        />
       </form>
     </div>
   );

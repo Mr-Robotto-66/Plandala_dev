@@ -5,10 +5,16 @@ import { getImageFromClipboard } from '../../utils/imageCompression';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 
-export const ImageUpload = ({ onImagesUploaded, folder = 'task-images' }) => {
+export const ImageUpload = ({
+  onImagesUploaded,
+  onImageRemoved,
+  existingImages = [],
+  folder = 'task-images'
+}) => {
   const { uploadMultipleImages, uploading, progress, error } = useImageUpload();
   const [previewUrls, setPreviewUrls] = useState([]);
   const [uploadedUrls, setUploadedUrls] = useState([]);
+  const [removedExistingImages, setRemovedExistingImages] = useState([]);
 
   // Handle file drop
   const onDrop = useCallback(async (acceptedFiles) => {
@@ -73,6 +79,13 @@ export const ImageUpload = ({ onImagesUploaded, folder = 'task-images' }) => {
 
   const removeUploadedImage = (index) => {
     setUploadedUrls((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingImage = (url) => {
+    setRemovedExistingImages((prev) => [...prev, url]);
+    if (onImageRemoved) {
+      onImageRemoved(url);
+    }
   };
 
   return (
@@ -146,6 +159,30 @@ export const ImageUpload = ({ onImagesUploaded, folder = 'task-images' }) => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Existing Images */}
+      {existingImages.filter((url) => !removedExistingImages.includes(url)).length > 0 && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          {existingImages
+            .filter((url) => !removedExistingImages.includes(url))
+            .map((url, index) => (
+              <div key={`existing-${index}`} className="relative group aspect-video rounded-lg overflow-hidden">
+                <img
+                  src={url}
+                  alt={`Existing ${index + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                <button
+                  onClick={() => removeExistingImage(url)}
+                  className="absolute top-2 right-2 p-1 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                  aria-label="Remove image"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))}
         </div>
       )}
 

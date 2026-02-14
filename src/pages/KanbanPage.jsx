@@ -117,8 +117,8 @@ export const KanbanPage = () => {
 
   return (
     <PageLayout
-      title="Kanban Board"
-      description="Organize and prioritize your development tasks"
+      title="Task Board"
+      description="Organize and prioritize your development tasks. Click a task to start a comment thread about that task"
     >
       <DndContext
         sensors={sensors}

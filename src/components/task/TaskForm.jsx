@@ -78,6 +78,13 @@ export const TaskForm = ({ task = null, onClose, onSave, defaultStatus, defaultP
     }));
   };
 
+  const handleImageRemoved = (url) => {
+    setFormData((prev) => ({
+      ...prev,
+      imageUrls: prev.imageUrls.filter((imageUrl) => imageUrl !== url),
+    }));
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
@@ -152,17 +159,17 @@ export const TaskForm = ({ task = null, onClose, onSave, defaultStatus, defaultP
       </div>
 
       {/* Image Upload */}
-      {!task && (
-        <div>
-          <label className="block text-sm font-medium text-plandala-text mb-2">
-            Attach Images
-          </label>
-          <ImageUpload
-            onImagesUploaded={handleImagesUploaded}
-            folder={`task-images/${Date.now()}`}
-          />
-        </div>
-      )}
+      <div>
+        <label className="block text-sm font-medium text-plandala-text mb-2">
+          {task ? 'Manage Images' : 'Attach Images'}
+        </label>
+        <ImageUpload
+          onImagesUploaded={handleImagesUploaded}
+          onImageRemoved={handleImageRemoved}
+          existingImages={formData.imageUrls}
+          folder={`task-images/${task?.id || Date.now()}`}
+        />
+      </div>
 
       {/* Buttons */}
       <div className="flex items-center justify-end space-x-3 pt-4">
