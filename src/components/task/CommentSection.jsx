@@ -6,7 +6,7 @@ import { Send, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 
 export const CommentSection = ({ taskId }) => {
-  const { comments, addComment, removeComment, loading } = useComments(taskId);
+  const { comments, addComment, removeComment, loading, error } = useComments(taskId);
   const { userName } = useUser();
   const [newComment, setNewComment] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -48,6 +48,15 @@ export const CommentSection = ({ taskId }) => {
 
   if (loading) {
     return <LoadingSpinner />;
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+        <p className="font-medium mb-1">Failed to load comments</p>
+        <p className="text-xs text-plandala-muted">{error}</p>
+      </div>
+    );
   }
 
   return (

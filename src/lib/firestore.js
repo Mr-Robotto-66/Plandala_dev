@@ -135,17 +135,26 @@ export const subscribeToTasks = (callback, onError) => {
   );
 };
 
-export const subscribeToComments = (taskId, callback) => {
+export const subscribeToComments = (taskId, callback, onError) => {
   const q = query(
     commentsCollection,
     where('taskId', '==', taskId),
     orderBy('createdAt', 'asc')
   );
-  return onSnapshot(q, (snapshot) => {
-    const comments = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    callback(comments);
-  });
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const comments = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      callback(comments);
+    },
+    (error) => {
+      console.error('Error in comments subscription:', error);
+      if (onError) {
+        onError(error);
+      }
+    }
+  );
 };

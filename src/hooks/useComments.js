@@ -15,10 +15,19 @@ export const useComments = (taskId) => {
     }
 
     // Subscribe to real-time comments
-    const unsubscribe = subscribeToComments(taskId, (updatedComments) => {
-      setComments(updatedComments);
-      setLoading(false);
-    });
+    const unsubscribe = subscribeToComments(
+      taskId,
+      (updatedComments) => {
+        setComments(updatedComments);
+        setError(null); // Clear any previous errors
+        setLoading(false);
+      },
+      (err) => {
+        console.error('Error subscribing to comments:', err);
+        setError(err.message || 'Failed to load comments');
+        setLoading(false); // CRITICAL: Stop spinner on error
+      }
+    );
 
     return () => {
       if (unsubscribe) {
