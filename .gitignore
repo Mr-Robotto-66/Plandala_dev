@@ -30,3 +30,14 @@ dist-ssr
 
 # gh-pages
 .cache
+
+# Firebase
+.firebase/
+*-debug.log
+firebase-debug.*.log
+
+# Note: These SHOULD be committed:
+# firebase.json
+# .firebaserc
+# firestore.rules
+# firestore.indexes.json

@@ -122,14 +122,95 @@ Firestore will automatically prompt you to create required indexes when you firs
   - `createdAt` - Ascending
 - Query scope: Collection
 
-## 8. Test the Connection
+**Note:** With Firebase CLI now set up, indexes can also be deployed via:
+```bash
+npm run firebase:indexes:deploy
+```
+See the "Managing Firestore Indexes with Firebase CLI" section below for details.
+
+## 8. Managing Firestore Indexes with Firebase CLI
+
+### Prerequisites
+
+Firebase CLI has been installed and configured for this project. The configuration files are:
+- `firebase.json` - Firebase project configuration
+- `.firebaserc` - Project aliases (set to `plandala-dev`)
+- `firestore.indexes.json` - Index definitions
+- `firestore.rules` - Security rules
+
+### Viewing Current Indexes
+
+```bash
+npm run firebase:indexes:list
+```
+
+This displays all indexes currently deployed to Firebase, including their build status (READY, CREATING, etc.).
+
+### Deploying Index Changes
+
+After modifying `firestore.indexes.json`:
+
+```bash
+npm run firebase:indexes:deploy
+```
+
+The deployment process will:
+1. Validate the index definition
+2. Create the composite index in the `plandala-dev` project
+3. Begin building the index (takes 1-2 minutes for small datasets)
+
+**Monitor progress:**
+- Run `npm run firebase:indexes:list` to check build status
+- Or check the Firebase Console: https://console.firebase.google.com/project/plandala-dev/firestore/indexes
+
+### Adding New Indexes
+
+1. Edit `firestore.indexes.json` to add the new index definition
+2. Deploy with `npm run firebase:indexes:deploy`
+3. Wait 1-2 minutes for index to build
+4. Verify with `npm run firebase:indexes:list`
+
+### Index Definition File
+
+All indexes are defined in `firestore.indexes.json` and version-controlled in git.
+
+**Current Indexes:**
+- **Comments by task**: Filters by `taskId` and orders by `createdAt` (required for comment queries)
+
+### Deploying Security Rules
+
+To deploy changes to `firestore.rules`:
+
+```bash
+npm run firebase:rules:deploy
+```
+
+### Deploying Both Indexes and Rules
+
+To deploy all Firestore configuration at once:
+
+```bash
+npm run firebase:deploy
+```
+
+### Authentication
+
+The Firebase CLI requires authentication. If you encounter authentication errors:
+
+```bash
+npx firebase login
+```
+
+Then retry the deployment command.
+
+## 9. Test the Connection
 
 1. Start the development server: `npm run dev`
 2. Open the browser console
 3. You should see: "Firebase initialized successfully"
 4. If you see errors, verify your `.env.local` values
 
-## Notes
+## 10. Notes
 
 - The `.env.local` file is gitignored for security
 - For production deployment, use `.env.production` or configure environment variables in your hosting platform
