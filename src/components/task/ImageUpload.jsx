@@ -4,6 +4,7 @@ import { useImageUpload } from '../../hooks/useImageUpload';
 import { getImageFromClipboard } from '../../utils/imageCompression';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { LoadingSpinner } from '../common/LoadingSpinner';
+import { isFirebaseConfigured, getFirebaseError } from '../../lib/firebase';
 
 export const ImageUpload = ({
   onImagesUploaded,
@@ -15,10 +16,18 @@ export const ImageUpload = ({
   const [previewUrls, setPreviewUrls] = useState([]);
   const [uploadedUrls, setUploadedUrls] = useState([]);
   const [removedExistingImages, setRemovedExistingImages] = useState([]);
+  const [configError, setConfigError] = useState(null);
+
+  // Check Firebase configuration on mount
+  useEffect(() => {
+    if (!isFirebaseConfigured) {
+      setConfigError(getFirebaseError());
+    }
+  }, []);
 
   // Handle file drop
   const onDrop = useCallback(async (acceptedFiles) => {
-    if (acceptedFiles.length === 0) return;
+    if (acceptedFiles.length === 0 || !isFirebaseConfigured) return;
 
     // Create preview URLs
     const previews = acceptedFiles.map((file) =>
@@ -90,11 +99,21 @@ export const ImageUpload = ({
 
   return (
     <div className="space-y-3">
+      {/* Configuration Error Warning */}
+      {configError && (
+        <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-sm">
+          <strong>Firebase Configuration Error:</strong> {configError}
+          <br />
+          <span className="text-xs opacity-80">Check your .env file for Firebase environment variables.</span>
+        </div>
+      )}
+
       {/* Dropzone */}
       <div
         {...getRootProps()}
         className={`
           border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all
+          ${configError ? 'opacity-30 cursor-not-allowed' : ''}
           ${isDragActive
             ? 'border-plandala-cyan-400 bg-plandala-cyan-400/10'
             : 'border-plandala-border hover:border-plandala-cyan-400'
@@ -137,10 +156,16 @@ export const ImageUpload = ({
         </div>
       )}
 
-      {/* Error */}
+      {/* Enhanced Error Display */}
       {error && (
-        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
-          {error}
+        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm space-y-1">
+          <div className="font-semibold">Upload Error</div>
+          <div>{error}</div>
+          {error.includes('Permission denied') && (
+            <div className="text-xs mt-2 opacity-80">
+              This usually means Firebase Storage security rules need to be configured.
+            </div>
+          )}
         </div>
       )}
 

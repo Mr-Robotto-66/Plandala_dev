@@ -45,33 +45,54 @@ export const useImageUpload = () => {
   const uploadMultipleImages = async (files, folder) => {
     try {
       setUploading(true);
+      setProgress(0); // EXPLICIT RESET
       setError(null);
 
-      const uploadPromises = Array.from(files).map(async (file, index) => {
-        // Validate file
-        validateImageFile(file);
+      const filesArray = Array.from(files);
+      const downloadURLs = [];
+      const errors = [];
 
-        // Compress image
-        const compressedFile = await compressImage(file);
+      // SEQUENTIAL UPLOAD - Replace Promise.all with for loop
+      for (let i = 0; i < filesArray.length; i++) {
+        const file = filesArray[i];
 
-        // Generate unique path
-        const path = generateImagePath(folder, file.name);
+        try {
+          validateImageFile(file);
+          const compressedFile = await compressImage(file);
+          const path = generateImagePath(folder, file.name);
 
-        // Upload to Firebase Storage
-        const downloadURL = await uploadImage(
-          compressedFile,
-          path,
-          (progressValue) => {
-            // Calculate overall progress
-            const overallProgress = ((index + progressValue / 100) / files.length) * 100;
-            setProgress(overallProgress);
-          }
-        );
+          const downloadURL = await uploadImage(
+            compressedFile,
+            path,
+            (fileProgressValue) => {
+              // Calculate overall: completed files + current file contribution
+              const completedFiles = i;
+              const currentFileContribution = fileProgressValue / 100;
+              const overallProgress =
+                ((completedFiles + currentFileContribution) / filesArray.length) * 100;
+              setProgress(overallProgress);
+            }
+          );
 
-        return downloadURL;
-      });
+          downloadURLs.push(downloadURL);
+        } catch (err) {
+          console.error(`Failed to upload ${file.name}:`, err);
+          errors.push({ file: file.name, error: err.message });
+        }
+      }
 
-      const downloadURLs = await Promise.all(uploadPromises);
+      // Handle partial failures
+      if (errors.length > 0) {
+        const errorMessage = errors.length === filesArray.length
+          ? `All uploads failed: ${errors[0].error}`
+          : `${errors.length} of ${filesArray.length} uploads failed`;
+        setError(errorMessage);
+
+        if (downloadURLs.length === 0) {
+          throw new Error(errorMessage);
+        }
+      }
+
       return downloadURLs;
     } catch (err) {
       console.error('Upload error:', err);
