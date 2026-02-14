@@ -1,0 +1,300 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Dark mode colors (default) */
+  --color-plandala-bg: #0a0a0f;
+  --color-plandala-surface: #12121a;
+  --color-plandala-border: #1e1e2e;
+
+  --color-plandala-blue-400: #6380f2;
+  --color-plandala-blue-500: #4361ee;
+  --color-plandala-blue-600: #3250d6;
+
+  --color-plandala-cyan-300: #5eead4;
+  --color-plandala-cyan-400: #22d3ee;
+  --color-plandala-cyan-500: #06b6d4;
+
+  --color-plandala-magenta-400: #e879f9;
+  --color-plandala-magenta-500: #d946ef;
+  --color-plandala-magenta-600: #c026d3;
+
+  --color-plandala-text: #e2e8f0;
+  --color-plandala-muted: #94a3b8;
+
+  --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Light mode overrides */
+.light {
+  --color-plandala-bg: #f8fafc;
+  --color-plandala-surface: #ffffff;
+  --color-plandala-border: #e2e8f0;
+  --color-plandala-text: #0f172a;
+  --color-plandala-muted: #64748b;
+}
+
+/* Base styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-plandala-bg);
+  color: var(--color-plandala-text);
+  font-family: var(--font-sans);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Glow effects */
+.glow-cyan {
+  box-shadow:
+    0 0 15px rgba(34, 211, 238, 0.3),
+    0 0 45px rgba(34, 211, 238, 0.1);
+}
+
+.glow-magenta {
+  box-shadow:
+    0 0 15px rgba(217, 70, 239, 0.3),
+    0 0 45px rgba(217, 70, 239, 0.1);
+}
+
+.glow-blue {
+  box-shadow:
+    0 0 15px rgba(67, 97, 238, 0.3),
+    0 0 45px rgba(67, 97, 238, 0.1);
+}
+
+.text-glow-cyan {
+  text-shadow:
+    0 0 20px rgba(34, 211, 238, 0.5),
+    0 0 40px rgba(34, 211, 238, 0.2);
+}
+
+.text-glow-magenta {
+  text-shadow:
+    0 0 20px rgba(217, 70, 239, 0.5),
+    0 0 40px rgba(217, 70, 239, 0.2);
+}
+
+/* Light mode glow adjustments */
+.light .glow-cyan {
+  box-shadow:
+    0 0 10px rgba(34, 211, 238, 0.2),
+    0 0 30px rgba(34, 211, 238, 0.05);
+}
+
+.light .glow-magenta {
+  box-shadow:
+    0 0 10px rgba(217, 70, 239, 0.2),
+    0 0 30px rgba(217, 70, 239, 0.05);
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(34, 211, 238, 0.4),
+      0 0 45px rgba(34, 211, 238, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 25px rgba(34, 211, 238, 0.6),
+      0 0 60px rgba(34, 211, 238, 0.25);
+  }
+}
+
+/* Glass-morphism card */
+.glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(18, 18, 26, 0.8),
+    rgba(18, 18, 26, 0.4)
+  );
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(30, 30, 46, 0.6);
+  border-radius: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.glass-card:hover {
+  border-color: rgba(34, 211, 238, 0.3);
+}
+
+/* Light mode glass card */
+.light .glass-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.6)
+  );
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.light .glass-card:hover {
+  border-color: rgba(34, 211, 238, 0.4);
+}
+
+/* Gradient backgrounds for columns */
+.column-high-priority {
+  background: linear-gradient(
+    180deg,
+    rgba(217, 70, 239, 0.1) 0%,
+    rgba(217, 70, 239, 0.02) 100%
+  );
+}
+
+.column-in-progress {
+  background: linear-gradient(
+    180deg,
+    rgba(67, 97, 238, 0.1) 0%,
+    rgba(67, 97, 238, 0.02) 100%
+  );
+}
+
+.column-not-started {
+  background: linear-gradient(
+    180deg,
+    rgba(34, 211, 238, 0.1) 0%,
+    rgba(34, 211, 238, 0.02) 100%
+  );
+}
+
+.column-testing {
+  background: linear-gradient(
+    180deg,
+    rgba(249, 115, 22, 0.1) 0%,
+    rgba(249, 115, 22, 0.02) 100%
+  );
+}
+
+.column-done {
+  background: linear-gradient(
+    180deg,
+    rgba(34, 197, 94, 0.1) 0%,
+    rgba(34, 197, 94, 0.02) 100%
+  );
+}
+
+/* Light mode column backgrounds */
+.light .column-high-priority {
+  background: linear-gradient(
+    180deg,
+    rgba(217, 70, 239, 0.05) 0%,
+    rgba(217, 70, 239, 0.01) 100%
+  );
+}
+
+.light .column-in-progress {
+  background: linear-gradient(
+    180deg,
+    rgba(67, 97, 238, 0.05) 0%,
+    rgba(67, 97, 238, 0.01) 100%
+  );
+}
+
+.light .column-not-started {
+  background: linear-gradient(
+    180deg,
+    rgba(34, 211, 238, 0.05) 0%,
+    rgba(34, 211, 238, 0.01) 100%
+  );
+}
+
+.light .column-testing {
+  background: linear-gradient(
+    180deg,
+    rgba(249, 115, 22, 0.05) 0%,
+    rgba(249, 115, 22, 0.01) 100%
+  );
+}
+
+.light .column-done {
+  background: linear-gradient(
+    180deg,
+    rgba(34, 197, 94, 0.05) 0%,
+    rgba(34, 197, 94, 0.01) 100%
+  );
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #ffffff 0%, #22d3ee 50%, #d946ef 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.light .gradient-text {
+  background: linear-gradient(135deg, #0f172a 0%, #22d3ee 50%, #d946ef 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gradient divider */
+.gradient-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(34, 211, 238, 0.3) 30%,
+    rgba(217, 70, 239, 0.3) 70%,
+    transparent
+  );
+}
+
+/* Drag overlay styles */
+.drag-overlay {
+  cursor: grabbing;
+  opacity: 0.5;
+  transform: rotate(3deg);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-plandala-surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-plandala-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-plandala-cyan-500);
+}
+
+/* Loading spinner */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
